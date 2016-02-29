@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import 'aframe';
 import './util/shorthand';
 import {Scene, Entity} from 'aframe-react';
 import Camera from './components/Camera';
+import Dodecahedron from './components/Dodecahedron';
 import Image from './components/Image';
 import Sky from './components/Sky';
 import Text from './components/Text';
@@ -45,11 +45,14 @@ export class App extends Component {
     return (
       <Scene onEnterVR={() => {leapCur.refine('isVR').set(true);}}
              onExitVR={() => {leapCur.refine('isVR').set(false);}}
+             onTick={()=>{this.forceUpdate()}}
       >
         <Camera>
-          <LeapMotion cursor={leapCur} />
+          <LeapMotion cursor={leapCur}/>
         </Camera>
         <Sky/>
+
+        <Dodecahedron radius={1}/>
 
       </Scene>
     );
