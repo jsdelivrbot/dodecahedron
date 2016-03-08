@@ -4,8 +4,7 @@ import ReactDOM from 'react-dom';
 
 class Polygon extends React.Component {
   render() {
-    // expects array(vertices) of arrays(coordinates)
-    const vertices = this.props.vertices.map(v => v.join(' ')).join(' ');
+    const vertices = this.props.vertices.map(v => v.toAframeString()).join(' ');
 
     return (
       <Entity {...this.props} geometry={{primitive: 'polygon', vertices}}/>
