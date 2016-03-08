@@ -18,13 +18,16 @@ class Dodecahedron extends React.Component {
        }*/
     };
 
+
+
     return (
       <Entity ref={rotateConstantly} {...this.props}>
         {pentagons.map((p, i) =>
           <Polygon key={i}
                    vertices={p.vertices}
-                   material={{transparent: true, opacity: 0.5, color: hslToHex(i / 12, 1, 0.5)}}/>
+                   material={{transparent: true, opacity: 1, color: hslToHex(i / 12, 1, 0.5)}}/>
         )}
+
       </Entity>
     );
   }
