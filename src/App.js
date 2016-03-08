@@ -84,7 +84,7 @@ export class App extends Component {
     return (
       <Scene onEnterVR={() => {leapCur.refine('isVR').set(true);}}
              onExitVR={() => {leapCur.refine('isVR').set(false);}}
-             onTick={(t, dt)=>{timeCur.set({t, dt})}}
+             onTick={(t, dt)=>{/*timeCur.set({t, dt})*/}}
              fog={{type: 'exponential', density: Math.pow(radius, -1.1), color: '#fff'}}
       >
         <Camera>
