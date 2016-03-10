@@ -5,14 +5,23 @@ import LeapMotionHand from './LeapMotionHand';
 import 'leapjs-plugins';
 import Leap from 'leapjs';
 
-import {Cursor} from 'react-cursor';
+import {Cursor, ImmutableOptimizations} from 'react-cursor';
+
+// Here we ignore cursor changes (Leap Motion updates between frames) and only update/re-render
+// when time changes, which means that a tick() happened.
+const _shouldComponentUpdate = ImmutableOptimizations(['time'], ['cursor']).shouldComponentUpdate;
 
 import _ from 'lodash';
 
 class LeapMotion extends React.Component {
   static propTypes = {
     cursor: PropTypes.instanceOf(Cursor),
+    time: PropTypes.instanceOf(Cursor),
   };
+
+  shouldComponentUpdate(nextProps) {
+    return _shouldComponentUpdate.call(this, nextProps);
+  }
 
   componentDidMount() {
     const cursor = this.props.cursor;
