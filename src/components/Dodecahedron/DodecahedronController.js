@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import {ImmutableOptimizations} from 'react-cursor';
 import {Entity} from 'aframe-react';
-import Dodecahedron from './Dodecahedron';
+import DodecahedronFrame from './DodecahedronFrame';
 import Polygon from '../Polygon';
 
 import {getPentagons} from './DodecahedronGeometry';
@@ -29,34 +29,19 @@ class DodecahedronController extends React.Component {
       obj.rotateOnAxis(axis, Math.PI);
     };
 
-    const innerDodecahedron = pentagons.map((p, pentIndex) => _(p.vertices)
-      .map((vertex, i, vertices) => [vertex, vertices[(i + 1) % vertices.length]])
-      .map((pair, polyIndex) => {
-        const center = pentagons[pentIndex].center;
-
-        const aperture = 0.6; //Math.sin(pentIndex + timeCur.value().t / 1000) * 0.4 + 0.6
-
-        const vertices = pair
-          .concat(V3().copy(pair[1]).lerp(center, aperture))
-          .concat(V3().copy(pair[0]).lerp(center, aperture));
-
-        return (
-          <Polygon key={`${pentIndex}${polyIndex}`}
-                   vertices={vertices}
-                   material={{color: hslToHex(pentIndex / 12, 1, 0.1)}}/>
-        );
-
-      }).value());
-
     return (
       <Entity>
         {pentCenters.map((vec, i) =>
-          <Dodecahedron radius={radius}
-                        onLoaded={_.partial(onLoadDod, V3().copy(vec).normalize())}
-                        position={vec.multiplyScalar(2.01).toAframeString()}/>
+          <DodecahedronFrame radius={radius}
+                             pentagons={pentagons}
+                             key={i}
+                             onLoaded={_.partial(onLoadDod, V3().copy(vec).normalize())}
+                             position={V3().copy(vec).multiplyScalar(2.01).toAframeString()}/>
         )}
 
-        {innerDodecahedron}
+        <DodecahedronFrame radius={radius}
+                           pentagons={pentagons}
+        />
       </Entity>
     );
   }
