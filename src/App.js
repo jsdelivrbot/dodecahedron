@@ -12,6 +12,9 @@ import LeapMotion from './components/LeapMotion';
 import Polygon from './components/Polygon';
 import Sky from './components/Sky';
 
+import './util/stlExporter';
+// saveSTL($('a-scene').object3D, 'dodeca')
+
 const radius = 20;
 
 export class App extends Component {
