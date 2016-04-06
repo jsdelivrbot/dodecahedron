@@ -13,11 +13,11 @@ class DodecahedronFrame extends React.Component {
       .map((pair, polyIndex) => {
         const center = pentagons[pentIndex].center;
 
-        const aperture = 0.4;
+        const aperture = 0.5;
 
         const vertices = pair
-          .concat(V3().copy(pair[1]).lerp(center, 1 - aperture))
-          .concat(V3().copy(pair[0]).lerp(center, 1 - aperture));
+          .concat(pair[1].clone().lerp(center, 1 - aperture))
+          .concat(pair[0].clone().lerp(center, 1 - aperture));
 
         return (
           <Polygon key={`${pentIndex}${polyIndex}`}

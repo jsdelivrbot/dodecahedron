@@ -53,7 +53,7 @@
     "webpack-hot-middleware": "^2.6.0"
   },
   "dependencies": {
-    "aframe-text-component": "^0.1.0",
+    "aframe-text-component": "ngokevin/aframe-text-component",
     "css-loader": "^0.23.1",
     "html-loader": "^0.4.3",
     "json-loader": "^0.5.4",

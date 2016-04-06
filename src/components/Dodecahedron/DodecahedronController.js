@@ -5,6 +5,7 @@ import {Entity} from 'aframe-react';
 import DodecahedronFrame from './DodecahedronFrame';
 import Polygon from '../Polygon';
 import Sphere from '../Sphere';
+import Text from '../Text';
 
 import {getPentagons} from './DodecahedronGeometry';
 import {hslToHex} from '../../util/colorConversion';
@@ -29,11 +30,13 @@ class DodecahedronView extends React.Component {
     return (
       <Entity>
         {pentCenters.map((vec, i) =>
-          <Sphere key={i}
-                  radius={0.2}
-                  color={hslToHex(i/ 12, 1, 0.1)}
-                  onLoaded={_.partial(this.props.onLoadPentCenter, i)}
-                  position={vec.toAframeString()}/>
+          <Text key={i}
+                look-at="[camera]"
+                text={{text: _.padStart(i, 2, '0')}}
+                radius={0.2}
+                color={hslToHex(i / 12, 1, 0.1)}
+                onLoaded={_.partial(this.props.onLoadPentCenter, i)}
+                position={vec.toAframeString()}/>
         )}
 
         {pentCenters.map((vec, i) =>
@@ -41,7 +44,7 @@ class DodecahedronView extends React.Component {
                              pentagons={pentagons}
                              key={i}
                              onLoaded={_.partial(onLoadDod, vec.clone().normalize())}
-                             position={V3().copy(vec).multiplyScalar(2.01).toAframeString()}/>
+                             position={vec.clone().multiplyScalar(2.01).toAframeString()}/>
         )}
 
         <DodecahedronFrame radius={radius}
@@ -58,11 +61,11 @@ class DodecahedronView extends React.Component {
 class DodecahedronController extends React.Component {
   constructor() {
     super();
-    this.portals = {};
+    this.portals = [];
     this.generatePortal = this.generatePortal.bind(this);
     this.onLoadPentCenter = this.onLoadPentCenter.bind(this);
 
-    this.shouldComponentUpdate = ImmutableOptimizations(['cameraPosCur']).shouldComponentUpdate.bind(this);
+    this.shouldComponentUpdate = ImmutableOptimizations(['cameraPosCur'], ['currNoteCur']).shouldComponentUpdate.bind(this);
   }
 
   componentDidUpdate() {
@@ -70,18 +73,23 @@ class DodecahedronController extends React.Component {
 
     let collisionOnThisTick = false;
     _.each(this.portals, (p, i) => {
-      if(p.plane.distanceToPoint(camPos) < 0.1) {
-        if(!this.hasCollided) {
+      if (p.plane.distanceToPoint(camPos) < 0.1) {
+        if (!this.hasCollided) {
           console.log('collision with ', i);
-
-          // fake torroidal geometry
-          camPos.multiplyScalar(-1);
-          this.props.cameraPosCur.set(camPos);
 
           // rotate the whole dodecahedral assembly on the axis we just collided with
           const dod = ReactDOM.findDOMNode(this.refs.dodecahedron).object3D;
           const axis = dod.worldToLocal(p.plane.normal.clone());
           dod.rotateOnAxis(axis, Math.PI);
+
+          // fake torroidal geometry
+          camPos.multiplyScalar(-1);
+          this.props.cameraPosCur.set(camPos);
+
+          const currNote = this.props.currNoteCur.value();
+          const nextNote = (currNote + i) % 12;
+          console.log('nextNote: ', nextNote);
+          this.props.currNoteCur.set(nextNote);
 
           // update our portals. defer so the scene has a chance to update world matrix
           _.defer(() => {
@@ -100,7 +108,7 @@ class DodecahedronController extends React.Component {
 
   generatePortal(i, obj) {
 
-    const vec = obj.getWorldPosition();
+    const vec = obj.getWorldPosition().multiplyScalar(-1);
     const vecLength = vec.length();
     const normal = vec.normalize();
 
@@ -116,7 +124,7 @@ class DodecahedronController extends React.Component {
 
   render() {
     return (
-      <DodecahedronView ref="dodecahedron" radius={this.props.radius} onLoadPentCenter={this.onLoadPentCenter} />
+      <DodecahedronView ref="dodecahedron" radius={this.props.radius} onLoadPentCenter={this.onLoadPentCenter}/>
     );
   }
 }

@@ -10,6 +10,7 @@ import Camera from './components/Camera';
 import DodecahedronController from './components/Dodecahedron/DodecahedronController';
 import LeapMotion from './components/LeapMotion';
 import Polygon from './components/Polygon';
+import Text from './components/Text';
 import Sky from './components/Sky';
 
 import './util/stlExporter';
@@ -27,6 +28,7 @@ export class App extends Component {
       camera: {
         position: V3(),
       },
+      currNote: 0,
       keys: {
         87: false,
         83: false,
@@ -69,7 +71,7 @@ export class App extends Component {
 
     const translate = V3(); //TODO: use camera forward vector
     const keys = this.state.keys;
-    const v = 0.1;
+    const v = 0.002 * dt;
     if(keys[87]) {
       translate.z -= v
     }
@@ -83,7 +85,13 @@ export class App extends Component {
       translate.x += v
     }
 
-    let camPos = V3().copy(this.cursor.refine('camera', 'position').value());
+    if(this.cursor.refine('leapMotion', 'isVR').value()) {
+
+    }
+    translate.z -= v;
+
+    let camPos = this.cursor.refine('camera', 'position').value().clone();
+    translate.applyQuaternion(this.camera.parent.quaternion);
     camPos.add(translate);
 
     this.cursor.refine('camera', 'position').set(camPos);
@@ -100,7 +108,7 @@ export class App extends Component {
       <Scene onEnterVR={() => {leapCur.refine('isVR').set(true);}}
              onExitVR={() => {leapCur.refine('isVR').set(false);}}
              onTick={(t, dt) => this.tick(t, dt)}
-             fog={{type: 'exponential', density: Math.pow(radius, -1.1), color: '#fff'}}
+             fog={{type: 'exponential', density: Math.pow(radius, -1.05), color: '#fff'}}
       >
         <Entity position={camPos.toAframeString()}>
           <Camera onLoaded={(evt) => {this.camera = evt.target.sceneEl.camera;}}>
@@ -108,7 +116,16 @@ export class App extends Component {
           </Camera>
         </Entity>
 
-        <DodecahedronController radius={radius} cameraPosCur={cursor.refine('camera', 'position')} />
+        <DodecahedronController radius={radius}
+                                cameraPosCur={cursor.refine('camera', 'position')}
+                                currNoteCur={cursor.refine('currNote')}
+        />
+
+        <Text look-at="[camera]"
+              scale="3 3 3"
+              text={{text: _.padStart(cursor.refine('currNote').value(), 2, '0')}} />
+
+
       </Scene>
     );
   }
