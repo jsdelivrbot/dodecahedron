@@ -85,17 +85,12 @@ export class App extends Component {
 
     let camPos = V3().copy(this.cursor.refine('camera', 'position').value());
     camPos.add(translate);
-    if(camPos.length() > radius * 0.9) { //TODO: plane intersection with pentagons
-      camPos.multiplyScalar(-0.9);
-      // TODO: find closest pentagon center when crossing through, rotate PentagonController 180 on that axis
-    }
-
 
     this.cursor.refine('camera', 'position').set(camPos);
   }
 
   render() {
-    const cursor = this.cursor = Cursor.build(this);
+    const cursor = window.cursor = this.cursor = Cursor.build(this);
     const leapCur = cursor.refine('leapMotion');
     const timeCur = this.timeCur = cursor.refine('time');
 
@@ -113,7 +108,7 @@ export class App extends Component {
           </Camera>
         </Entity>
 
-        <DodecahedronController radius={radius} />
+        <DodecahedronController radius={radius} cameraPosCur={cursor.refine('camera', 'position')} />
       </Scene>
     );
   }
